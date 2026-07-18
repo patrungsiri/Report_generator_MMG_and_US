@@ -140,12 +140,11 @@
         }
         textarea#previewText {
             height: 500px;
-            /* ปรับเปลี่ยนฟอนต์ให้อ่านง่ายขึ้น ขนาดใหญ่ขึ้น และเพิ่มช่องไฟบรรทัด */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #fff;
             color: #000;
             border: 1px solid #aaa;
-            font-size: 16px; 
+            font-size: 16px;
             line-height: 1.6;
             padding: 15px;
         }
@@ -185,7 +184,8 @@
 <div class="container">
     <h1>Mammography & Ultrasound Report Generator</h1>
 
-    <form id="reportForm">
+    <!-- เพิ่ม spellcheck="true" ใน form เพื่อให้เบราว์เซอร์ช่วยตรวจคำผิดอัตโนมัติ -->
+    <form id="reportForm" spellcheck="true">
         <!-- ==================== REPORT TYPE ==================== -->
         <div class="report-type-box">
             <label class="title">REPORT TYPE:</label>
@@ -438,8 +438,9 @@
     <!-- ==================== PREVIEW SECTION ==================== -->
     <div class="preview-section" id="previewArea">
         <h2>Preview Report</h2>
-        <p><i>ตรวจสอบความถูกต้องและกดปุ่ม Copy เพื่อนำไปวางในโปรแกรมของโรงพยาบาลได้เลยครับ</i></p>
-        <textarea id="previewText" readonly></textarea>
+        <p><i>สามารถตรวจสอบความถูกต้อง พิมพ์แก้ไขคำผิดในช่องนี้ได้โดยตรง (คำผิดจะมีขีดเส้นใต้สีแดง) แล้วค่อยกดปุ่ม Copy ครับ</i></p>
+        <!-- เปิด spellcheck และนำ readonly ออก เพื่อให้แก้ไขและตรวจคำผิดในกล่อง Preview ได้เลย -->
+        <textarea id="previewText" spellcheck="true"></textarea>
         <div class="action-buttons" style="margin-top: 15px;">
             <button type="button" class="copy-btn" onclick="copyText()">📋 Copy to Clipboard</button>
         </div>
