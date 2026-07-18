@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mammography & Ultrasound Report</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --border-color: #dddddd;
+            --text-color: #333333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: var(--primary-color);
+            background-color: #e9f2fb;
+            padding: 10px 15px;
+            border-left: 5px solid var(--primary-color);
+            margin-top: 35px;
+            border-radius: 0 4px 4px 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .form-group label.title {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #222;
+        }
+        .choices label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-weight: normal;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .choices label:hover {
+            background-color: #f0f0f0;
+        }
+        .choices input[type="radio"], .choices input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.1);
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        input[type="text"].inline-input {
+            width: 120px;
+            padding: 6px;
+            margin: 0 5px;
+            margin-top: 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            border-bottom: 2px solid var(--primary-color);
+            background-color: #fdfdfd;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .row-inputs {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .row-inputs input {
+            margin-top: 0;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button.generate-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        button.copy-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .preview-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .preview-section h2 {
+            margin-top: 0;
+        }
+        textarea#previewText {
+            height: 500px;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #aaa;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .report-type-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        .report-type-box .choices {
+            display: flex;
+            gap: 20px;
+        }
+        .report-type-box label {
+            font-weight: bold;
+            color: #856404;
+        }
+        .flex-inline-group {
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 6px;
+            padding: 4px 8px;
+            flex-wrap: wrap;
+        }
+        .flex-inline-group label {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        .flex-inline-group label:hover {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mammography & Ultrasound Report Generator</h1>
+
+    <form id="reportForm">
+        <!-- ==================== REPORT TYPE ==================== -->
+        <div class="report-type-box">
+            <label class="title">REPORT TYPE:</label>
+            <div class="choices">
+                <label><input type="radio" name="report_type" value="both" checked onchange="toggleSections()"> Mammography & Ultrasound (Both)</label>
+                <label><input type="radio" name="report_type" value="us_only" onchange="toggleSections()"> Ultrasound Only</label>
+            </div>
+        </div>
+
+        <!-- ==================== GENERAL INFO ==================== -->
+        <h2>General Information</h2>
+        
+        <div class="form-group">
+            <label class="title">INDICATION:</label>
+            <div class="choices">
+                <label><input type="radio" name="indication" value="Screening"> Screening</label>
+                <label><input type="radio" name="indication" value="Diagnostic evaluation"> Diagnostic evaluation</label>
+            </div>
+            <input type="text" id="indication_note" placeholder="Note...">
+        </div>
+
+        <div class="form-group">
+            <label class="title">CLINICAL HISTORY:</label>
+            <div class="choices">
+                <label><input type="radio" name="history" value="Asymptomatic"> Asymptomatic</label>
+            </div>
+            <input type="text" id="history_note" placeholder="Note...">
+        </div>
+
+        <div class="form-group">
+            <label class="title">PRIOR STUDY COMPARISON:</label>
+            <div class="choices">
+                <label><input type="radio" name="prior" value="None"> None</label>
+            </div>
+            <input type="text" id="prior_note" placeholder="Note...">
+        </div>
+
+        <div id="section-technique">
+            <div class="form-group">
+                <label class="title">TECHNIQUE:</label>
+                <div class="choices">
+                    <label><input type="radio" name="technique" value="Bilateral digital mammography routine (CC and MLO) views."> Bilateral digital mammography routine (CC and MLO) views.</label>
+                </div>
+                <div class="flex-inline-group">
+                    <label style="margin-right: 5px;">
+                        <input type="checkbox" id="tech_additional_cb"> Additional view was obtained in
+                    </label>
+                    <input type="text" id="tech_additional_txt" class="inline-input" placeholder="...">
+                </div>
+                <input type="text" id="technique_note" placeholder="Note...">
+            </div>
+        </div>
+
+        <!-- ==================== MAMMOGRAPHY ==================== -->
+        <div id="section-mammography">
+            <h2>Mammography</h2>
+
+            <div class="form-group">
+                <label class="title">Breast tissue:</label>
+                <div class="choices">
+                    <label><input type="radio" name="breast_tissue" value="Almost entirely fat"> Almost entirely fat</label>
+                    <label><input type="radio" name="breast_tissue" value="Scattered fibroglandular densities"> Scattered fibroglandular densities</label>
+                    <label><input type="radio" name="breast_tissue" value="Heterogeneously dense, could obscure detectable of small masses"> Heterogeneously dense, could obscure detectable of small masses</label>
+                    <label><input type="radio" name="breast_tissue" value="Extremely dense, may lower the sensitivity of mammography"> Extremely dense, may lower the sensitivity of mammography</label>
+                </div>
+                <input type="text" id="breast_tissue_note" placeholder="Note...">
+            </div>
+
+            <div class="form-group">
+                <label class="title">Mass:</label>
+                <div class="choices">
+                    <label><input type="radio" name="mam_mass" value="Not detectable"> Not detectable</label>
+                </div>
+                <div class="row-inputs">
+                    <input type="text" id="mam_m1" placeholder="- M1 = ...">
+                    <input type="text" id="mam_m2" placeholder="- M2 = ...">
+                </div>
+                <input type="text" id="mam_mass_note" placeholder="Note...">
+            </div>
+
+            <div class="form-group">
+                <label class="title">Calcifications:</label>
+                <div class="choices">
+                    <label><input type="radio" name="calcifications" value="Diffuse punctate/round microcalcifications at both breasts"> Diffuse punctate/round microcalcifications at both breasts</label>
+                    <label><input type="radio" name="calcifications" value="Not detectable"> Not detectable</label>
+                </div>
+                <input type="text" id="calcifications_note" placeholder="Note...">
+            </div>
+
+            <div class="form-group">
+                <label class="title">Architectural distortion:</label>
+                <div class="choices">
+                    <label><input type="radio" name="mam_arch" value="Not detectable"> Not detectable</label>
+                </div>
+                <input type="text" id="mam_arch_note" placeholder="Note...">
+            </div>
+
+            <div class="form-group">
+                <label class="title">Asymmetry:</label>
+                <div class="choices">
+                    <label><input type="radio" name="asymmetry" value="Not detectable"> Not detectable</label>
+                </div>
+                <input type="text" id="asymmetry_note" placeholder="Note...">
+            </div>
+
+            <div class="form-group">
+                <label class="title">Dilated tubular structure:</label>
+                <div class="choices">
+                    <label><input type="radio" name="tubular" value="Not detectable"> Not detectable</label>
+                </div>
+                <input type="text" id="tubular_note" placeholder="Note...">
+            </div>
+
+            <div class="form-group">
+                <label class="title">Other:</label>
+                <div class="choices">
+                    <label><input type="radio" name="mam_other" value="Not detectable abnormal axillary lymphadenopathy"> Not detectable abnormal axillary lymphadenopathy</label>
+                </div>
+                <input type="text" id="mam_other_note" placeholder="Note...">
+            </div>
+        </div>
+
+        <!-- ==================== ULTRASOUND ==================== -->
+        <h2>Ultrasound</h2>
+
+        <div class="form-group">
+            <label class="title">Background echotexture:</label>
+            <div class="choices">
+                <label><input type="radio" name="echotexture" value="Homogeneous background echotexture-fat"> Homogeneous background echotexture-fat</label>
+                <label><input type="radio" name="echotexture" value="Homogeneous background echotexture-fibrogladular"> Homogeneous background echotexture-fibrogladular</label>
+                <label><input type="radio" name="echotexture" value="Heterogeneous background"> Heterogeneous background</label>
+            </div>
+            <input type="text" id="echotexture_note" placeholder="Note...">
+        </div>
+
+        <div class="form-group">
+            <label class="title">Cyst:</label>
+            <div class="choices">
+                <label><input type="radio" name="cyst" value="A few simple cysts at both breasts, benign."> A few simple cysts at both breasts, benign.</label>
+                <label><input type="radio" name="cyst" value="Not detectable"> Not detectable</label>
+            </div>
+            <input type="text" id="cyst_note" placeholder="Note...">
+        </div>
+
+        <div class="form-group">
+            <label class="title">Mass:</label>
+            <div class="choices">
+                <div class="flex-inline-group" style="padding-left: 0; margin-bottom: 0;">
+                    <label style="margin-right: 5px;">
+                        <input type="radio" name="us_mass" value="A few well-defined oval hypoechoic nodules at both breasts, probably benign at"> A few well-defined oval hypoechoic nodules at both breasts, probably benign at
+                    </label>
+                    <input type="text" id="us_mass_benign_at" class="inline-input" placeholder="...">
+                </div>
+                <label><input type="radio" name="us_mass" value="Not detectable"> Not detectable</label>
+            </div>
+            <div class="row-inputs">
+                <input type="text" id="us_m1" placeholder="- M1 = ...">
+                <input type="text" id="us_m2" placeholder="- M2 = ...">
+            </div>
+            <input type="text" id="us_mass_note" placeholder="Note...">
+        </div>
+
+        <div class="form-group">
+            <label class="title">Architectural disruption:</label>
+            <div class="choices">
+                <label><input type="radio" name="us_arch" value="Not detectable"> Not detectable</label>
+            </div>
+            <input type="text" id="us_arch_note" placeholder="Note...">
+        </div>
+
+        <div class="form-group">
+            <label class="title">Others:</label>
+            <div class="choices">
+                <label><input type="radio" name="us_other" value="Not detectable abnormal axillary lymphadenopathy"> Not detectable abnormal axillary lymphadenopathy</label>
+            </div>
+            <input type="text" id="us_other_note" placeholder="Note...">
+        </div>
+
+        <!-- ==================== IMPRESSION ==================== -->
+        <h2>Impression</h2>
+        <div class="form-group">
+            <div class="choices">
+                <label><input type="checkbox" name="impression_cb" value="Benign calcifications in both breasts"> Benign calcifications in both breasts</label>
+                <label><input type="checkbox" name="impression_cb" value="No radiographic evidence of malignancy"> No radiographic evidence of malignancy</label>
+                <label><input type="checkbox" name="impression_cb" value="A few simple cysts in both breasts, benign."> A few simple cysts in both breasts, benign.</label>
+            </div>
+            <div class="flex-inline-group">
+                <label style="margin-right: 5px;">
+                    <input type="checkbox" name="impression_cb" value="post_mastectomy"> Post
+                </label>
+                <input type="text" id="imp_post1" class="inline-input" placeholder="...">
+                <span style="margin: 0 5px;">mastectomy with unremarkable</span>
+                <input type="text" id="imp_post2" class="inline-input" placeholder="...">
+                <span style="margin-left: 5px;">chest wall and bilateral axillae</span>
+            </div>
+            <input type="text" id="imp1" placeholder="Other Impression 1...">
+            <input type="text" id="imp2" placeholder="Other Impression 2...">
+            <textarea id="imp_note" rows="3" placeholder="Additional Impression Notes..."></textarea>
+        </div>
+
+        <!-- ==================== OVERALL ASSESSMENT ==================== -->
+        <h2>Overall Assessment</h2>
+        <div class="form-group">
+            <label class="title">BI-RADS Category:</label>
+            <div class="choices">
+                <label><input type="radio" name="birads" value="1 (Negative)"> BI-RADS Category 1 (Negative)</label>
+                <label><input type="radio" name="birads" value="2 (Benign)"> BI-RADS Category 2 (Benign)</label>
+                <label><input type="radio" name="birads" value="3 (Probably benign)"> BI-RADS Category 3 (Probably benign)</label>
+                <label><input type="radio" name="birads" value="4A (Low suspicious for malignancy)"> BI-RADS Category 4A (Low suspicious for malignancy)</label>
+                <label><input type="radio" name="birads" value="4B (Moderate suspicious for malignancy)"> BI-RADS Category 4B (Moderate suspicious for malignancy)</label>
+                <label><input type="radio" name="birads" value="4C (High suspicious for malignancy)"> BI-RADS Category 4C (High suspicious for malignancy)</label>
+                <label><input type="radio" name="birads" value="5 (Highly suggestive of malignancy)"> BI-RADS Category 5 (Highly suggestive of malignancy)</label>
+                <label><input type="radio" name="birads" value="6 (Known Biopsy-Proven Malignancy)"> BI-RADS Category 6 (Known Biopsy-Proven Malignancy)</label>
+            </div>
+            <input type="text" id="birads_note" placeholder="Note...">
+        </div>
+
+        <!-- ==================== RECOMMENDATION ==================== -->
+        <h2>Recommendation</h2>
+        <div class="form-group">
+            <div class="choices">
+                <label><input type="checkbox" name="rec" value="Routine screening mammography if unchanged breast self-exam, monthly"> Routine screening mammography if unchanged breast self-exam, monthly</label>
+                <label><input type="checkbox" name="rec" value="Suggest 6 months follow up complete study if unchanged breast self-exam, monthly and breast specialist surgeon consultation"> Suggest 6 months follow up complete study if unchanged breast self-exam, monthly and breast specialist surgeon consultation</label>
+                <label><input type="checkbox" name="rec" value="Suggested 6 months follow up with ultrasound breast if unchanged breast self-exam, monthly and breast specialist surgeon consultation"> Suggested 6 months follow up with ultrasound breast if unchanged breast self-exam, monthly and breast specialist surgeon consultation</label>
+                <label><input type="checkbox" name="rec" value="Annual follow up with ultrasound breast if unchanged breast self-exam, monthly"> Annual follow up with ultrasound breast if unchanged breast self-exam, monthly</label>
+                <label><input type="checkbox" name="rec" value="Routine screening mammography at age 40-year-old if unchanged breast self-exam, monthly"> Routine screening mammography at age 40-year-old if unchanged breast self-exam, monthly</label>
+                <label><input type="checkbox" name="rec" value="Ultrasound-guide core needle biopsy and breast specialist surgeon consultation"> Ultrasound-guide core needle biopsy and breast specialist surgeon consultation</label>
+                <label><input type="checkbox" name="rec" value="Stereotactic guide core breast biopsy and breast specialist surgeon consultation"> Stereotactic guide core breast biopsy and breast specialist surgeon consultation</label>
+                <label><input type="checkbox" name="rec" value="Vacuum-assisted breast biopsy with ultrasound-guide/stereotactic guide and breast specialist surgeon consultation"> Vacuum-assisted breast biopsy with ultrasound-guide/stereotactic guide and breast specialist surgeon consultation</label>
+                <label><input type="checkbox" name="rec" value="Excision mass and breast specialist surgeon consultation"> Excision mass and breast specialist surgeon consultation</label>
+            </div>
+            <textarea id="rec_note" rows="2" placeholder="Note / Other Recommendations..."></textarea>
+        </div>
+
+        <!-- ==================== NOTES ==================== -->
+        <h2>Notes</h2>
+        <div class="form-group">
+            <div class="choices">
+                <label><input type="checkbox" name="notes" value="False negative rate of mammography is approximately 10-15%. Management of palpable abnormality must be based on clinical consideration"> False negative rate of mammography is approximately 10-15%. Management of palpable abnormality must be based on clinical consideration</label>
+                <label><input type="checkbox" name="notes" value="Low sensitivity in detecting ductal carcinoma in situ (DCIS). Management of palpable abnormality must be based on clinical consideration"> Low sensitivity in detecting ductal carcinoma in situ (DCIS). Management of palpable abnormality must be based on clinical consideration</label>
+            </div>
+            <textarea id="final_note" rows="2" placeholder="Additional Notes..."></textarea>
+        </div>
+
+        <div class="action-buttons">
+            <button type="button" class="generate-btn" onclick="generatePreview()">⬇️ Generate Preview Text</button>
+        </div>
+    </form>
+    
+    <!-- ==================== PREVIEW SECTION ==================== -->
+    <div class="preview-section" id="previewArea">
+        <h2>Preview Report</h2>
+        <p><i>ตรวจสอบความถูกต้องและกดปุ่ม Copy เพื่อนำไปวางในโปรแกรมของโรงพยาบาลได้เลยครับ</i></p>
+        <textarea id="previewText" readonly></textarea>
+        <div class="action-buttons" style="margin-top: 15px;">
+            <button type="button" class="copy-btn" onclick="copyText()">📋 Copy to Clipboard</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Script to toggle sections based on Report Type
+    function toggleSections() {
+        let reportType = document.querySelector('input[name="report_type"]:checked').value;
+        let mamSection = document.getElementById('section-mammography');
+        let techSection = document.getElementById('section-technique');
+        
+        if (reportType === 'us_only') {
+            mamSection.style.display = 'none';
+            techSection.style.display = 'none';
+        } else {
+            mamSection.style.display = 'block';
+            techSection.style.display = 'block';
+        }
+    }
+
+    // 2. Script for deselecting Radio Buttons (Except Report Type)
+    document.querySelectorAll('input[type="radio"]:not([name="report_type"])').forEach(radio => {
+        radio.addEventListener('click', function(e) {
+            if (this.wasChecked) {
+                this.checked = false;
+                this.wasChecked = false;
+            } else {
+                let group = document.querySelectorAll(`input[name="${this.name}"]`);
+                group.forEach(r => r.wasChecked = false);
+                this.wasChecked = true;
+            }
+        });
+    });
+
+    // 3. Script to Generate Text Report format
+    function generatePreview() {
+        let reportType = document.querySelector('input[name="report_type"]:checked').value;
+        let report = "";
+
+        // Change Header based on Report Type
+        if (reportType === 'us_only') {
+            report = "ULTRASOUND BREASTS BOTH SIDES\n\n";
+        } else {
+            report = "MAMMOGRAPHY AND ULTRASOUND BREASTS BOTH SIDES\n\n";
+        }
+
+        function getRadioAndNote(name, label) {
+            let checked = document.querySelector(`input[name="${name}"]:checked`);
+            let note = document.getElementById(`${name}_note`).value.trim();
+            let valStr = checked ? checked.value : "";
+            
+            let combined = [valStr, note].filter(Boolean).join(" ");
+            if (!combined && !checked && !note) {
+                return `${label}: \n`;
+            }
+            return `${label}: ${combined}\n`;
+        }
+
+        report += getRadioAndNote('indication', 'INDICATION');
+        report += getRadioAndNote('history', 'CLINICAL HISTORY');
+        report += getRadioAndNote('prior', 'PRIOR STUDY COMPARISON');
+        report += "\n";
+        
+        // Include Technique and Mammography ONLY if "both" is selected
+        if (reportType === 'both') {
+            // Custom logic for Technique to include Additional View
+            let checkedTech = document.querySelector(`input[name="technique"]:checked`);
+            let tech_note = document.getElementById(`technique_note`).value.trim();
+            let techVal = checkedTech ? checkedTech.value : "";
+            let combinedTech = [techVal, tech_note].filter(Boolean).join(" ");
+            
+            if (!combinedTech && !checkedTech && !tech_note) {
+                report += `TECHNIQUE: \n`;
+            } else {
+                report += `TECHNIQUE: ${combinedTech}\n`;
+            }
+
+            let tech_add_cb = document.getElementById('tech_additional_cb');
+            if (tech_add_cb && tech_add_cb.checked) {
+                report += `Additional view was obtained in ${document.getElementById('tech_additional_txt').value.trim()}\n`;
+            }
+            
+            report += "\nMAMMOGRAPHY:\n";
+            report += getRadioAndNote('breast_tissue', 'Breast tissue');
+            
+            // Custom logic for Mammography Mass
+            let mam_mass_checked = document.querySelector(`input[name="mam_mass"]:checked`);
+            let mam_mass_note = document.getElementById(`mam_mass_note`).value.trim();
+            let mam_m1 = document.getElementById(`mam_m1`).value.trim();
+            let mam_m2 = document.getElementById(`mam_m2`).value.trim();
+            
+            report += `Mass: ${mam_mass_checked ? mam_mass_checked.value : ""}`;
+            if (mam_mass_note) report += ` ${mam_mass_note}`;
+            report += "\n";
+            if (mam_m1) report += `M1 = ${mam_m1}\n`;
+            if (mam_m2) report += `M2 = ${mam_m2}\n`;
+
+            report += getRadioAndNote('calcifications', 'Calcifications');
+            report += getRadioAndNote('mam_arch', 'Architectural distortion');
+            report += getRadioAndNote('asymmetry', 'Asymmetry');
+            report += getRadioAndNote('tubular', 'Dilated tubular structure');
+            report += getRadioAndNote('mam_other', 'Other');
+            
+            report += "\nULTRASOUND:\n";
+        }
+
+        // Ultrasound sections (Always included)
+        report += getRadioAndNote('echotexture', 'Background echotexture');
+        report += getRadioAndNote('cyst', 'Cyst');
+        
+        // Custom logic for Ultrasound Mass (includes Inline fill-in-the-blank)
+        let us_mass_checked = document.querySelector(`input[name="us_mass"]:checked`);
+        let us_mass_note = document.getElementById(`us_mass_note`).value.trim();
+        let us_m1 = document.getElementById(`us_m1`).value.trim();
+        let us_m2 = document.getElementById(`us_m2`).value.trim();
+        let us_mass_str = "";
+        
+        if (us_mass_checked) {
+            us_mass_str = us_mass_checked.value;
+            // Check if the specific inline-option is selected
+            if (us_mass_str === "A few well-defined oval hypoechoic nodules at both breasts, probably benign at") {
+                let at_loc = document.getElementById('us_mass_benign_at').value.trim();
+                if (at_loc) us_mass_str += ` ${at_loc}`;
+            }
+        }
+        
+        report += `Mass: ${us_mass_str}`;
+        if (us_mass_note) report += ` ${us_mass_note}`;
+        report += "\n";
+        if (us_m1) report += `M1 = ${us_m1}\n`;
+        if (us_m2) report += `M2 = ${us_m2}\n`;
+        
+        report += getRadioAndNote('us_arch', 'Architectural disruption');
+        report += getRadioAndNote('us_other', 'Others');
+        
+        // Custom logic for Impression
+        report += "\nIMPRESSION:\n";
+        let impressions = [];
+        let imp_cbs = document.querySelectorAll(`input[name="impression_cb"]:checked`);
+        
+        imp_cbs.forEach(cb => {
+            if (cb.value === "post_mastectomy") {
+                let p1 = document.getElementById('imp_post1').value.trim();
+                let p2 = document.getElementById('imp_post2').value.trim();
+                impressions.push(`Post ${p1} mastectomy with unremarkable ${p2} chest wall and bilateral axillae`);
+            } else {
+                impressions.push(cb.value);
+            }
+        });
+        
+        let imp1 = document.getElementById('imp1').value.trim();
+        let imp2 = document.getElementById('imp2').value.trim();
+        if (imp1) impressions.push(imp1);
+        if (imp2) impressions.push(imp2);
+        
+        if (impressions.length > 0) {
+            impressions.forEach(imp => { report += `- ${imp}\n`; });
+        }
+        
+        let imp_note = document.getElementById('imp_note').value.trim();
+        if (imp_note) report += `${imp_note}\n`;
+        
+        report += "\nOVERALL ASSESSMENT:\n";
+        let birads = document.querySelector(`input[name="birads"]:checked`);
+        let birads_note = document.getElementById('birads_note').value.trim();
+        if(birads || birads_note) {
+            report += `BI-RADS Category ${birads ? birads.value : ""} ${birads_note}\n`;
+        } else {
+            report += `BI-RADS Category \n`;
+        }
+        
+        report += "\nRECOMMENDATION:\n";
+        let recs = document.querySelectorAll(`input[name="rec"]:checked`);
+        recs.forEach(el => {
+            report += `- ${el.value}\n`;
+        });
+        let rec_note = document.getElementById('rec_note').value.trim();
+        if (rec_note) report += `${rec_note}\n`;
+        if (recs.length === 0 && !rec_note) report += "\n";
+
+        report += "\nNOTES:\n";
+        let notes = document.querySelectorAll(`input[name="notes"]:checked`);
+        notes.forEach(el => {
+            report += `${el.value}\n\n`;
+        });
+        let final_note = document.getElementById('final_note').value.trim();
+        if (final_note) report += `${final_note}\n`;
+
+        // Update the textarea
+        document.getElementById('previewText').value = report.trim();
+        
+        // Scroll to preview area
+        document.getElementById('previewArea').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 4. Script to Copy Text
+    function copyText() {
+        let textarea = document.getElementById('previewText');
+        if(textarea.value.trim() === "") {
+            alert('กรุณากด Generate Preview Text ก่อนทำการ Copy ครับ');
+            return;
+        }
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        alert('คัดลอกข้อความสำเร็จ! (Copied to clipboard)');
+    }
+
+    // Trigger on load to ensure correct sections are visible
+    window.onload = toggleSections;
+</script>
+</body>
+</html>
